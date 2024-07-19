@@ -26,6 +26,10 @@ class KeyGenerationPage(QWidget):
         self.select_box.addItems(self.options.keys())
         self.select_box.setStyleSheet("font-size: 18px; padding: 5px;")
 
+        self.keystring_input = QTextEdit()        
+        self.keystring_input.setFixedHeight(50)
+        self.keystring_input.setStyleSheet("font-size: 18px; padding: 5px; height: 20px;")
+
         # Create and configure text box for displaying the generated value
         self.text_box = QTextEdit()
         self.text_box.setReadOnly(True)
@@ -56,8 +60,8 @@ class KeyGenerationPage(QWidget):
         layout = QVBoxLayout()
         layout.addWidget(pageLabel)
 
-        layout.addWidget(QLabel("Select key size:"))
-        layout.addWidget(self.select_box)
+        layout.addWidget(QLabel("Input key:"))
+        layout.addWidget(self.keystring_input)
 
         layout.addWidget(self.confirm_button)
 
@@ -71,20 +75,29 @@ class KeyGenerationPage(QWidget):
 
     def go_back(self):
         self.text_box.setPlainText("")
+        self.keystring_input.setPlainText("")
         self.stack.setCurrentIndex(0)
 
     def confirm_selection(self):
-        selected_label = self.select_box.currentText()
-        key_size = self.options.get(selected_label, "")
+        keystring = self.keystring_input.toPlainText()
+        if len(keystring) != 16:
+            QMessageBox.critical(self, "Error", "Key should be exactly 16 characters")
+            return
+        # selected_label = self.select_box.currentText()
+        # key_size = self.options.get(selected_label, "")
         # Generate key based on the selection
-        generated_key = self.generate_key(key_size)
+        generated_key = self.generate_key(keystring)
         self.text_box.setPlainText(generated_key)
     
-    def generate_key(self, key_size):
+    def generate_key(self, keystring):
         # Generate a key from the key_size and returns as base64 string
         # key_size is in number of bits, (128, 192 and 256 in this case)
-        key_size = int(key_size / 8)
-        key = get_random_bytes(key_size)
+        binary_str = ''.join(format(ord(i), '08b') for i in keystring)
+        integer_value = int(binary_str, 2)
+        byte_length = (len(binary_str) + 7) // 8
+        key = integer_value.to_bytes(byte_length, byteorder='big')
+        # key_size = int(key_size / 8)
+        # key = get_random_bytes(key_size)
         base64_string = convert_to_b64str(key)
         return base64_string
 
