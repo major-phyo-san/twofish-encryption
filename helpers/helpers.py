@@ -19,3 +19,11 @@ def convert_to_b64str(bytes):
 
 def convert_to_str(bytes):
     return bytes.decode("utf-8")
+
+def convert_string_to_key(keystring):
+    binary_str = ''.join(format(ord(i), '08b') for i in keystring)
+    integer_value = int(binary_str, 2)
+    byte_length = (len(binary_str) + 7) // 8
+    key = integer_value.to_bytes(byte_length, byteorder='big')
+    base64_string = convert_to_b64str(key)
+    return base64_string

@@ -33,7 +33,7 @@ class MainPage(QWidget):
 
         # Layout for buttons (horizontal layout)
         button_layout = QHBoxLayout()
-        button_layout.addWidget(button1)
+        # button_layout.addWidget(button1)
         button_layout.addWidget(button2)
         button_layout.addWidget(button3)
 
