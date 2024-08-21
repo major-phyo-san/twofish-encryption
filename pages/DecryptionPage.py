@@ -3,12 +3,14 @@ import psutil
 import time
 import tracemalloc
 
+from Crypto.Random import get_random_bytes
+
 from PyQt6.QtWidgets import QLabel, QVBoxLayout, QHBoxLayout, QWidget, QPushButton, QMessageBox, QFileDialog, QTextEdit
 from PyQt6.QtCore import Qt
 
 from twofish import Twofish
 
-from helpers.helpers import unpad, convert_to_bytes, convert_to_b64str, convert_to_str, convert_string_to_key
+from helpers.helpers import unpad, convert_to_bytes, convert_to_b64str, convert_to_str, convert_string_to_key, generate_random_string
 
 class DecryptionPage(QWidget):
     def __init__(self,stack):
@@ -192,9 +194,19 @@ class DecryptionPage(QWidget):
             errMsg = "Decryption failed: password not correct "
             QMessageBox.critical(self, "Error", errMsg)
         
-        if decrypted_data:            
-            plainText = convert_to_str(decrypted_data)
-            return plainText
+        if decrypted_data:     
+            try:       
+                plainText = convert_to_str(decrypted_data)
+                return plainText
+            except Exception as e:
+                QMessageBox.critical(self, "Error", "Decryption failed, ciphertext corrupted.")
+                print("Error, decryption failed, ciphertext corrupted.")
+                # random_bytes = get_random_bytes(len(cipher_text_bytes))
+                # random_base64_string = convert_to_b64str(decrypted_data)
+                # plainText = random_base64_string
+                plainText = generate_random_string(len(decrypted_data))
+                # plainText = convert_to_b64str(decrypted_data) # convert corrupted decrypted datat to b64 str
+                return plainText
 
     def save_to_file(self):
         if not self.plainText:

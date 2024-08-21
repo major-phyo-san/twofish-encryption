@@ -1,4 +1,6 @@
 import base64
+import random
+import string
 
 def pad(data, block_size):
         pad_len = block_size - (len(data) % block_size)
@@ -27,3 +29,10 @@ def convert_string_to_key(keystring):
     key = integer_value.to_bytes(byte_length, byteorder='big')
     base64_string = convert_to_b64str(key)
     return base64_string
+
+def generate_random_string(length):
+    # Use string.ascii_letters for both uppercase and lowercase letters
+    # Use string.digits for numbers
+    characters = string.ascii_letters + string.digits
+    random_string = ''.join(random.choice(characters) for _ in range(length))
+    return random_string
